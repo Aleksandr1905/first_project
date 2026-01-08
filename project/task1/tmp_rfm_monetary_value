@@ -1,0 +1,18 @@
+with money_value as (
+select
+u.id as user_id,
+sum(o.cost) as money_sum
+from
+analysis.users u left join analysis.orders o
+on u.id = o.user_id
+and o.status = 4 and
+o.order_ts >= '2022-01-01'
+group by u.id)
+
+insert into tmp_rfm_monetary_value(
+  user_id, monetary_value)
+
+select
+user_id,
+ntile(5) over(order by money_sum asc nulls first) as monetary_value
+from money_value
